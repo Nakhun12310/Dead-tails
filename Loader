@@ -1,4 +1,7 @@
--- Cookie Hub Script
+-- Load Fluent UI and its add-ons
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 -- Services
 local Players = game:GetService("Players")
@@ -9,113 +12,101 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 -- Destroy old UI if exists
-local existingGui = CoreGui:FindFirstChild("NFHub")
+local existingGui = CoreGui:FindFirstChild("CookieHub")
 if existingGui then
-	existingGui:Destroy()
+    existingGui:Destroy()
 end
 
--- Create ScreenGui
-local NFHub = Instance.new("ScreenGui")
-NFHub.Name = "NFHub"
-NFHub.ResetOnSpawn = false
-NFHub.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-NFHub.Parent = CoreGui
+-- Create the Fluent UI Window for Cookie Hub
+local Window = Fluent.CreateWindow({
+    Title = "Cookie Hub", 
+    Size = UDim2.new(0, 430, 0, 220), 
+    Position = UDim2.new(0.5, -215, 0.5, -110)
+})
 
--- Create Main Frame
-local Main = Instance.new("Frame")
-Main.Name = "Main"
-Main.Parent = NFHub
-Main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-Main.BorderSizePixel = 0
-Main.Position = UDim2.new(0.5, -215, 0.5, -110)
-Main.Size = UDim2.new(0, 430, 0, 220)
+-- Create the TopBar in Fluent UI style
+local TopBar = Fluent.CreateFrame({
+    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+    Size = UDim2.new(1, 0, 0, 30)
+})
 
--- Create TopBar
-local TopBar = Instance.new("Frame")
-TopBar.Name = "TopBar"
-TopBar.Parent = Main
-TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-TopBar.BorderSizePixel = 0
-TopBar.Size = UDim2.new(1, 0, 0, 30)
+-- Title Label in Fluent UI style
+local Title = Fluent.CreateTextLabel({
+    Text = "Cookie Hub",
+    Font = Enum.Font.GothamBold,
+    TextSize = 18,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    Size = UDim2.new(1, 0, 1, 0),
+    BackgroundTransparency = 1
+})
 
--- Title Label
-local Title = Instance.new("TextLabel")
-Title.Name = "Title"
-Title.Parent = TopBar
-Title.BackgroundTransparency = 1
-Title.Size = UDim2.new(1, 0, 1, 0)
-Title.Font = Enum.Font.GothamBold
-Title.Text = "NullFire"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 18
+-- Add TopBar and Title to the Window
+Window:AddChild(TopBar)
+TopBar:AddChild(Title)
 
--- Discord Button
-local Discord = Instance.new("TextButton")
-Discord.Name = "Discord"
-Discord.Parent = Main
-Discord.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-Discord.Position = UDim2.new(0, 10, 1, 10)
-Discord.Size = UDim2.new(0, 100, 0, 30)
-Discord.Font = Enum.Font.Gotham
-Discord.Text = "Discord"
-Discord.TextColor3 = Color3.fromRGB(255, 255, 255)
-Discord.TextSize = 14
+-- Create the Discord Button
+local DiscordButton = Fluent.CreateButton({
+    Text = "Discord",
+    Size = UDim2.new(0, 100, 0, 30),
+    Position = UDim2.new(0, 10, 1, 10),
+    OnClick = function()
+        setclipboard("https://discord.gg/XTg88GvPAK")
+    end
+})
 
--- TP to Game Button
-local TP = Instance.new("TextButton")
-TP.Name = "TP"
-TP.Parent = Main
-TP.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-TP.Position = UDim2.new(0, 120, 1, 10)
-TP.Size = UDim2.new(0, 100, 0, 30)
-TP.Font = Enum.Font.Gotham
-TP.Text = "TP to Game"
-TP.TextColor3 = Color3.fromRGB(255, 255, 255)
-TP.TextSize = 14
+-- Create the TP to Game Button
+local TPButton = Fluent.CreateButton({
+    Text = "TP to Game",
+    Size = UDim2.new(0, 100, 0, 30),
+    Position = UDim2.new(0, 120, 1, 10),
+    OnClick = function()
+        TeleportService:Teleport(13772394625, LocalPlayer) -- Replace with actual PlaceId
+    end
+})
 
--- Functionality: Set clipboard to Discord invite
-Discord.MouseButton1Click:Connect(function()
-    setclipboard("https://discord.gg/XTg88GvPAK")
-end)
+-- Add Buttons to the Window
+Window:AddChild(DiscordButton)
+Window:AddChild(TPButton)
 
--- Functionality: Teleport to a game
-TP.MouseButton1Click:Connect(function()
-    TeleportService:Teleport(13772394625, LocalPlayer) -- Replace with actual PlaceId
-end)
+-- Enable Dragging for the window
+Window:SetDraggable(true)
 
--- Dragging functionality
+-- Dragging functionality for Cookie Hub window
 local dragging, dragInput, dragStart, startPos
 
 local function update(input)
-	local delta = input.Position - dragStart
-	Main.Position = UDim2.new(
-		startPos.X.Scale, startPos.X.Offset + delta.X,
-		startPos.Y.Scale, startPos.Y.Offset + delta.Y
-	)
+    local delta = input.Position - dragStart
+    Window.Position = UDim2.new(
+        startPos.X.Scale, startPos.X.Offset + delta.X,
+        startPos.Y.Scale, startPos.Y.Offset + delta.Y
+    )
 end
 
 TopBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		dragging = true
-		dragStart = input.Position
-		startPos = Main.Position
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Window.Position
 
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
 end)
 
 TopBar.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		dragInput = input
-	end
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		update(input)
-	end
+    if input == dragInput and dragging then
+        update(input)
+    end
 end)
+
+-- Optionally, use the InterfaceManager to handle UI state saving, etc.
+-- Example: SaveManager:SaveData("CookieHubData", {Position = Window.Position})
