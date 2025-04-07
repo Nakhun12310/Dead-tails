@@ -75,12 +75,12 @@ TP.TextSize = 14
 
 -- Functionality: Set clipboard to Discord invite
 Discord.MouseButton1Click:Connect(function()
-    setclipboard("https://discord.gg/nullfire")
+    setclipboard("https://discord.gg/XTg88GvPAK")
 end)
 
 -- Functionality: Teleport to a game
 TP.MouseButton1Click:Connect(function()
-    TeleportService:Teleport(123456789, LocalPlayer) -- Replace with actual PlaceId
+    TeleportService:Teleport(13772394625, LocalPlayer) -- Replace with actual PlaceId
 end)
 
 -- Dragging functionality
